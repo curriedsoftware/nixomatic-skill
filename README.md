@@ -18,7 +18,21 @@ Works with **Nix** directly or via **Docker** (`nixos/nix`).
 
 ## Install
 
-### Per-project
+### Using [skills.sh](https://skills.sh)
+
+```bash
+# Per-project
+npx skills add -s '*' -a '*' curriedsoftware/nixomatic-skill
+```
+
+```bash
+# Global (all projects)
+npx skills add -s '*' -a '*' -g curriedsoftware/nixomatic-skill
+```
+
+### Manual
+
+#### Per-project
 
 Symlink or copy the `nixomatic` directory into your project's skills directory:
 
@@ -34,7 +48,7 @@ mkdir -p .codex/skills
 ln -s /path/to/nixomatic-skill/nixomatic .codex/skills/nixomatic
 ```
 
-### Global (all projects)
+#### Global (all projects)
 
 Place it under the global skills directory so every project picks it up:
 
