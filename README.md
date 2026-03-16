@@ -1,16 +1,21 @@
 # nixomatic-skill
 
-An agent skill that sets up reproducible development environments using
-[nixomatic](https://nixomatic.com).
+An agent skill that gives you and your agents instant access to **any software**
+on-the-fly using [nixomatic](https://nixomatic.com).
 
 Compatible with any agent that supports the skills convention, including
 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and
 [Codex](https://openai.com/index/introducing-codex/).
 
-When you ask your agent to build, test, lint, format, or set up a project, this
-skill automatically detects the required packages from project files (e.g.
-`package.json`, `Cargo.toml`, `go.mod`) and runs commands inside a Nix
-environment — no `flake.nix` authoring required. It also keeps a
+Need to convert a PDF to text? Resize an image? Transcode video? Build a Rust
+project? This skill lets your agent run any tool available in
+[nixpkgs](https://search.nixos.org/packages) — instantly, in one shot, without
+altering the current system. It works for one-off tasks (e.g. `pdftotext` via
+`poppler-utils`, `ffmpeg`, `imagemagick`) as well as full development
+environments detected from project files (`package.json`, `Cargo.toml`,
+`go.mod`, etc.).
+
+For project development environments, it also keeps a
 `## Development Environment` section in the project README so anyone can
 reproduce the environment.
 
@@ -75,6 +80,14 @@ You need at least one of:
 - [Docker](https://docs.docker.com/get-docker/) (uses the `nixos/nix` image)
 
 ## How it works
+
+**For one-shot tasks** (file conversion, data processing, any ad-hoc tool use):
+
+1. Identifies the nixpkgs package that provides the tool you need.
+2. Runs the command inside `nix develop` with a nixomatic URL — instantly,
+   without installing anything permanently.
+
+**For project development environments:**
 
 1. Scans project files to detect languages, runtimes, and build tools.
 2. Constructs a `https://nixomatic.com/?p=pkg1,pkg2,...` URL with the required

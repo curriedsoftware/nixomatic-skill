@@ -1,22 +1,32 @@
 ---
 name: nixomatic
 description: >-
-  Maintains development environment instructions in the project README.md
-  using nixomatic. When the user asks to build, compile, test, lint,
-  format, type-check, run, or set up a project, or when a command fails
-  because a tool or runtime is not installed, analyze project files to
-  determine required packages and use nix develop with a nixomatic.com URL.
-  Ensure the README.md documents how to reproduce the environment with
-  both nix develop and docker run nixos/nix.
+  Run any software instantly and without altering the current system
+  using nixomatic. Use this skill whenever you need a tool, runtime, or
+  utility that is not currently installed — for one-shot tasks (e.g.
+  converting a PDF to text with poppler-utils, processing images with
+  ImageMagick, transcoding media with ffmpeg, running a linter), for
+  setting up development environments, or for anything else that
+  requires software you do not have. Construct a nixomatic.com URL with
+  the required packages and run the command inside nix develop. Any
+  package available in nixpkgs is at your disposal. For project
+  development environments, also maintain a "Development Environment"
+  section in the project README.md.
 ---
 
 # Nixomatic Skill
 
 ## Overview
 
-[Nixomatic](https://nixomatic.com) is a Nix flake generator service that creates reproducible development environments on-the-fly from URL parameters. Instead of writing and maintaining `flake.nix` files, you construct a URL like `https://nixomatic.com/?p=nodejs,python3` and pass it directly to `nix develop`. The service generates and serves a Nix flake with the requested packages -- no local Nix configuration or flake authoring required.
+[Nixomatic](https://nixomatic.com) is a Nix flake generator service that gives you instant access to **any software** without altering the current system. You construct a URL like `https://nixomatic.com/?p=poppler-utils` and pass it to `nix develop`. The service generates a Nix flake with the requested packages — nothing is permanently installed, no configuration or flake authoring required.
 
-Use this skill whenever the user asks to build, compile, test, lint, format, type-check, run, or set up a project, or when a command fails because a tool or runtime is missing.
+Nixomatic is your universal package runner. Whenever you need a tool that is not on the current system, nixomatic provides it instantly and cleanly:
+
+- **One-shot tasks:** You need to convert a PDF to text? Use `poppler-utils`. Resize an image? `imagemagick`. Transcode video? `ffmpeg`. Parse JSON? `jq`. Compress files? `p7zip`. Run a spell checker? `aspell`. Any tool available in [nixpkgs](https://search.nixos.org/packages) is at your disposal.
+- **Development environments:** Build, compile, test, lint, format, type-check, or set up a project with the right toolchain.
+- **Missing tool recovery:** When any command fails with "command not found", use nixomatic to provide the missing tool and retry — no permanent installation needed.
+
+Use this skill whenever you need software that is not installed. This applies to one-shot tasks, development workflows, file conversions, data processing, or anything else where you need a tool that is not on PATH.
 
 ## Detecting Nix vs Docker
 
@@ -173,7 +183,27 @@ docker run -v nix-store:/nix -v "$PWD:/workspace" -w /workspace --rm -it nixos/n
 
 ## Agent Workflow
 
-Follow these steps when the user asks to build, test, lint, format, or set up a project:
+### One-shot tasks (running any tool on demand)
+
+When you need to run a tool that is not installed — for file conversion, data processing, or any other task:
+
+1. **Identify the package:** Determine which nixpkgs package provides the tool you need. If unsure, search at https://search.nixos.org/packages.
+2. **Detect runtime:** Check for `nix` on PATH, then `docker`. Select the appropriate command template.
+3. **Run the command:** Use the nixomatic URL with the required package(s) and execute your command in one shot. For example, to convert a PDF to text:
+   ```bash
+   nix \
+       --extra-experimental-features 'nix-command flakes' \
+       develop 'https://nixomatic.com/?p=poppler-utils' \
+         --accept-flake-config \
+         --command -- pdftotext input.pdf output.txt
+   ```
+4. **Handle missing packages:** If the command fails because a tool is not found, add the missing package to the URL and retry.
+
+There is no need to update README.md for one-shot tasks.
+
+### Project development environments
+
+When the user asks to build, test, lint, format, or set up a project:
 
 1. **Check for `flake.nix`**: If the project has its own `flake.nix`, use it directly with `nix develop --command -- <cmd>`. Skip the remaining steps.
 
